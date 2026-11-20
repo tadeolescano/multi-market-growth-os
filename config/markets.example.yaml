@@ -1,0 +1,81 @@
+# Markets, stages, channels and guardrails as data.
+# Version this file and review changes like code: a stage change or a CAC band
+# change moves budget, so it deserves a pull request and a reviewer.
+
+region:
+  name: example-region
+  planning_currency: USD
+  planning_fx_rates:        # fixed for the planning year
+    ARS: 0.0011
+    CLP: 0.00105
+    PEN: 0.27
+  budget_split:
+    market_budgets: 0.78
+    central_test_fund: 0.14
+    central_infrastructure: 0.08
+
+stage_weights:
+  launch: 1
+  traction: 3
+  scale: 5
+
+channel_split_by_stage:
+  launch:   { primary: 0.50, test: 0.30, support: 0.20 }
+  traction: { primary: 0.60, test: 0.20, support: 0.20 }
+  scale:    { primary: 0.65, test: 0.10, support: 0.25 }
+
+guardrails:
+  max_cac_payback_months: 12
+  max_monthly_reallocation: 0.25
+  kill_switch:
+    cac_multiple_of_band: 2.0
+    consecutive_months: 3
+
+markets:
+  - code: AR
+    name: Argentina
+    stage: scale
+    local_currency: ARS
+    owner: market-lead-ar
+    cac_band_usd: { min: 60, max: 110 }
+    channels:
+      primary: [crm_lifecycle, paid_social_prospecting]
+      test: [referral_program]
+      support: [paid_search, content_seo, retargeting]
+    seasonality_peaks: [mar, apr, sep, oct]
+
+  - code: CL
+    name: Chile
+    stage: traction
+    local_currency: CLP
+    owner: market-lead-cl
+    cac_band_usd: { min: 80, max: 140 }
+    channels:
+      primary: [paid_search, trade_events]
+      test: [paid_social_prospecting, partnerships]
+      support: [crm_lifecycle, retargeting]
+    seasonality_peaks: [mar, oct, nov]
+
+  - code: PE
+    name: Peru
+    stage: launch
+    local_currency: PEN
+    owner: market-lead-pe
+    cac_band_usd: { min: 90, max: 180 }
+    launch_budget_cap_usd_per_quarter: 45000
+    channels:
+      primary: [paid_search, sales_enablement]
+      test: [trade_events, paid_social_prospecting]
+      support: [retargeting]
+    seasonality_peaks: [apr, may, aug]
+
+channels:
+  paid_search:             { family: paid,   owner: performance }
+  paid_social_prospecting: { family: paid,   owner: performance }
+  retargeting:             { family: paid,   owner: performance }
+  crm_lifecycle:           { family: crm,    owner: crm }
+  sales_enablement:        { family: sales,  owner: sales }
+  trade_events:            { family: events, owner: market_lead }
+  partnerships:            { family: partner, owner: market_lead }
+  content_seo:             { family: owned,  owner: content }
+  referral_program:        { family: owned,  owner: crm }
